@@ -47,13 +47,13 @@ class _HomeScreen extends State<HomeScreen> {
                     Text('Local mobile network CCTV sample', textAlign: TextAlign.center),
                     Spacer(flex: 2),
                     ElevatedButton(
-                      onPressed: () => _srv(context),
-                      child: Text('Server (monitor)'),
+                      onPressed: () => _cli(context),
+                      child: Text('Camera (client)'),
                     ),
                     Space3(),
                     ElevatedButton(
-                      onPressed: () => _cli(context),
-                      child: Text('Client (camera)'),
+                      onPressed: () => _srv(context),
+                      child: Text('Monitor (server)'),
                     ),
                     Spacer(flex: 3),
                     ElevatedButton(

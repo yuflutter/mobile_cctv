@@ -13,26 +13,29 @@ class ImageView extends StatelessWidget {
 
   @override
   build(context) {
-    return AspectRatio(
-      aspectRatio: imageDto.height / imageDto.width,
-      child: LayoutBuilder(
-        builder: (context, box) {
-          return FutureBuilder<ui.Image>(
-            future: imageDto.toUiImage(targetWidth: box.maxWidth, targetHeight: box.maxHeight),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return ErrorView(Log.error(snapshot.error!, snapshot.stackTrace));
-              } else if (!snapshot.hasData) {
-                return Void();
-              } else {
-                final img = snapshot.data!;
-                return CustomPaint(
-                  painter: _ImagePainter(img),
-                );
-              }
-            },
-          );
-        },
+    return RotatedBox(
+      quarterTurns: (MediaQuery.of(context).orientation == Orientation.portrait) ? 1 : 0,
+      child: AspectRatio(
+        aspectRatio: imageDto.width / imageDto.height,
+        child: LayoutBuilder(
+          builder: (context, box) {
+            return FutureBuilder<ui.Image>(
+              future: imageDto.toUiImage(targetWidth: box.maxWidth, targetHeight: box.maxHeight),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return ErrorView(Log.error(snapshot.error!, snapshot.stackTrace));
+                } else if (!snapshot.hasData) {
+                  return Void();
+                } else {
+                  final img = snapshot.data!;
+                  return CustomPaint(
+                    painter: _ImagePainter(img),
+                  );
+                }
+              },
+            );
+          },
+        ),
       ),
     );
   }
