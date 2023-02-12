@@ -71,12 +71,12 @@ class _HomeScreen extends State<HomeScreen> {
     );
   }
 
-  void _srv(context) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => MonitorScreen1()));
-  }
-
   void _cli(context) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => CameraScreen1()));
+  }
+
+  void _srv(context) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => MonitorScreen1()));
   }
 
   void _both(context) {

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,10 @@ class ImageView extends StatelessWidget {
   @override
   build(context) {
     return RotatedBox(
-      quarterTurns: (MediaQuery.of(context).orientation == Orientation.portrait) ? 1 : 0,
+      quarterTurns:
+          ((!Platform.isAndroid && !Platform.isIOS) || MediaQuery.of(context).orientation == Orientation.portrait)
+              ? 1
+              : 0,
       child: AspectRatio(
         aspectRatio: imageDto.width / imageDto.height,
         child: LayoutBuilder(
