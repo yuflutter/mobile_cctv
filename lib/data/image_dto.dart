@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 
 class ImageDto {
-  final Uint8List dto; // Транспортные данные (черно-белые данные LUMA + 4 байта ширина/высота)
+  final Uint8List dto; // Транспортный пакет: заголовок (длина пакета + ширина/высота картинки) + черно-белые пиксели
   final int width;
   final int height;
   ui.Image? _uiImage; // Кэширование при выводе на экран
@@ -15,22 +15,22 @@ class ImageDto {
     return ImageDto._(Uint8List(0), 0, 0);
   }
 
-  factory ImageDto.fromCameraImage(CameraImage img) {
-    if (img.format.group == ImageFormatGroup.yuv420) {
-      final dto = Uint8List(img.width * img.height + 4);
-      final bw = img.planes[0].bytes;
-      // Log.info('${img.width} * ${img.height} = ${img.width * img.height} (${bw.length})');
+  factory ImageDto.fromCameraImage(CameraImage camImg) {
+    if (camImg.format.group == ImageFormatGroup.yuv420) {
+      final dto = Uint8List(6 + camImg.width * camImg.height);
 
-      for (int i = 0; i < bw.length; i++) {
-        dto[i] = bw[i];
+      final headBuf = dto.buffer.asByteData(0, 6);
+      headBuf.setInt16(0, dto.length);
+      headBuf.setInt16(2, camImg.width);
+      headBuf.setInt16(4, camImg.height);
+
+      final pixels = camImg.planes[0].bytes;
+      for (int i = 0; i < pixels.length; i++) {
+        dto[6 + i] = pixels[i];
       }
 
-      final sizeBuf = dto.buffer.asByteData(dto.length - 4);
-      sizeBuf.setInt16(0, img.width);
-      sizeBuf.setInt16(2, img.height);
-
-      return ImageDto._(dto, img.width, img.height);
-    } else if (img.format.group == ImageFormatGroup.bgra8888) {
+      return ImageDto._(dto, camImg.width, camImg.height);
+    } else if (camImg.format.group == ImageFormatGroup.bgra8888) {
       // доделать для IOS
       return ImageDto.blank();
     } else {
@@ -39,9 +39,9 @@ class ImageDto {
   }
 
   factory ImageDto.fromDto(Uint8List dto) {
-    if (dto.length > 4) {
-      final sizeBuf = dto.buffer.asByteData(dto.length - 4);
-      return (ImageDto._(dto, sizeBuf.getInt16(0), sizeBuf.getInt16(2)));
+    if (dto.length > 6) {
+      final headBuf = dto.buffer.asByteData(0, 6);
+      return (ImageDto._(dto, headBuf.getInt16(2), headBuf.getInt16(4)));
     } else {
       return ImageDto.blank();
     }
@@ -51,12 +51,12 @@ class ImageDto {
     final bgra = Uint8List(width * height * 4);
     for (int y = 0; y < height * width; y += width) {
       for (int x = 0; x < width; x++) {
-        final luma = dto[y + x];
+        final pixel = dto[6 + y + x];
         final xy = (y + x) * 4;
         bgra
-          ..[xy] = luma
-          ..[xy + 1] = luma
-          ..[xy + 2] = luma
+          ..[xy] = pixel
+          ..[xy + 1] = pixel
+          ..[xy + 2] = pixel
           ..[xy + 3] = 0xFF;
       }
     }

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:camera/camera.dart';
-import 'package:mobile_cctv/settings.dart';
 import 'package:provider/provider.dart';
 
+import '/settings.dart';
 import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/data/image_dto.dart';
@@ -11,6 +11,7 @@ import '/model/network_client_model.dart';
 
 class CameraModel extends AbstractModel {
   final NetworkClientModel? _networkModel;
+  //
   CameraController? cameraController;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
   final _frameDurationMs = (1000 / frameFrequency).round();

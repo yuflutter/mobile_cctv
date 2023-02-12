@@ -9,6 +9,7 @@ enum _Status { connecting, connected }
 
 class NetworkClientModel extends AbstractModel {
   final bool bothTest;
+  //
   String host;
   int port;
   WebSocket? _socket;

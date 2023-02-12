@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 
-import 'package:mobile_cctv/settings.dart';
-
+import '/settings.dart';
 import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/core/local_storage.dart';
@@ -12,6 +11,7 @@ enum _Status { listening, connected }
 
 class NetworkServerModel extends AbstractModel {
   final bool bothTest;
+  //
   int port;
   HttpServer? _httpServer;
   HttpRequest? _request;
