@@ -15,24 +15,25 @@ class BothTestScreen extends StatelessWidget {
   @override
   build(context) {
     return ProviderInjector(
-        providers: [
-          ChangeNotifierProvider(create: (context) => NetworkServerModel(bothTest: true)..init()),
-          ChangeNotifierProvider(create: (context) => NetworkClientModel(bothTest: true)..init()),
-          ChangeNotifierProvider(create: (context) => CameraModel(context)..init()),
-        ],
-        builder: (context) {
-          return Screen(
-            body: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(child: CameraScreen2(bothTest: true)),
-                  Container(height: 2, color: Colors.white),
-                  Expanded(child: MonitorScreen2(bothTest: true)),
-                ],
-              ),
+      providers: [
+        ChangeNotifierProvider(create: (context) => NetworkServerModel(bothTest: true)..init()),
+        ChangeNotifierProvider(create: (context) => NetworkClientModel(bothTest: true)..init()),
+        ChangeNotifierProvider(create: (context) => CameraModel(context)..init()),
+      ],
+      builder: (context) {
+        return Screen(
+          body: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(child: CameraScreen2(isBothTest: true)),
+                Container(height: 2, color: Colors.white),
+                Expanded(child: MonitorScreen2(isBothTest: true)),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }

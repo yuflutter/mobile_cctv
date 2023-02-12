@@ -9,17 +9,17 @@ import '/model/network_client_model.dart';
 import '/view/image_stream_view.dart';
 
 class CameraScreen2 extends StatelessWidget {
-  final bool withImageStreamPreview;
-  final bool bothTest;
+  final bool isImageStreamPreview;
+  final bool isBothTest;
 
-  const CameraScreen2({super.key, this.withImageStreamPreview = false, this.bothTest = false});
+  const CameraScreen2({super.key, this.isImageStreamPreview = false, this.isBothTest = false});
 
   @override
   build(context) {
     final cameraModel = context.watch<CameraModel>();
     final networkModel = context.watch<NetworkClientModel>();
     return Screen(
-      noBackButton: bothTest,
+      noBackButton: isBothTest,
       body: Center(
         child: Column(
           children: [
@@ -28,10 +28,12 @@ class CameraScreen2 extends StatelessWidget {
                 builder: (_, __) => CameraPreview(cameraModel.cameraController!),
               ),
             ),
-            ...(withImageStreamPreview)
+            ...(isImageStreamPreview)
                 ? [
                     Space1(),
-                    Expanded(child: ImageStreamView(imageStream: cameraModel.imageStream)),
+                    Expanded(
+                      child: ImageStreamView(imageStream: cameraModel.imageStream),
+                    ),
                   ]
                 : [],
             Space1(),

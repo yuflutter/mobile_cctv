@@ -61,6 +61,6 @@ class CameraScreen1 extends StatelessWidget {
   void _start(BuildContext context) {
     context.read<CameraModel>().init();
     context.read<NetworkClientModel>().init();
-    Navigator.push(context, MaterialPageRoute(builder: (_) => CameraScreen2(withImageStreamPreview: true)));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => CameraScreen2(isImageStreamPreview: true)));
   }
 }

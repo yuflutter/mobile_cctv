@@ -53,10 +53,10 @@ class CameraModel extends AbstractModel {
   }
 
   @override
-  void dispose() {
-    cameraController?.stopImageStream();
-    cameraController?.dispose();
-    _imageStreamController.close();
+  void dispose() async {
+    await cameraController?.stopImageStream();
+    await cameraController?.dispose();
+    await _imageStreamController.close();
     super.dispose();
   }
 }

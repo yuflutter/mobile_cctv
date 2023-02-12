@@ -14,26 +14,36 @@ class ImageView extends StatelessWidget {
 
   @override
   build(context) {
+    final sourceRatio = imageDto.width / imageDto.height;
     return RotatedBox(
       quarterTurns:
-          ((!Platform.isAndroid && !Platform.isIOS) || MediaQuery.of(context).orientation == Orientation.portrait)
+          (!Platform.isAndroid && !Platform.isIOS || MediaQuery.of(context).orientation == Orientation.portrait)
               ? 1
               : 0,
       child: AspectRatio(
-        aspectRatio: imageDto.width / imageDto.height,
+        aspectRatio: sourceRatio,
         child: LayoutBuilder(
           builder: (context, box) {
+            double targetWidth;
+            double targetHeight;
+            final boxRatio = box.maxWidth / box.maxHeight;
+            if (boxRatio <= sourceRatio) {
+              targetWidth = box.maxWidth;
+              targetHeight = targetWidth / sourceRatio;
+            } else {
+              targetHeight = box.maxHeight;
+              targetWidth = targetHeight * sourceRatio;
+            }
             return FutureBuilder<ui.Image>(
-              future: imageDto.toUiImage(targetWidth: box.maxWidth, targetHeight: box.maxHeight),
+              future: imageDto.toUiImage(targetWidth: targetWidth, targetHeight: targetHeight),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return ErrorView(Log.error(snapshot.error!, snapshot.stackTrace));
                 } else if (!snapshot.hasData) {
                   return Void();
                 } else {
-                  final img = snapshot.data!;
                   return CustomPaint(
-                    painter: _ImagePainter(img),
+                    painter: _ImagePainter(snapshot.data!),
                   );
                 }
               },

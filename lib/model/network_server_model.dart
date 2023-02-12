@@ -67,17 +67,17 @@ class NetworkServerModel extends AbstractModel {
     setDone();
   }
 
-  void _disconnect() {
-    _socket?.close();
+  void _disconnect() async {
+    await _socket?.close();
     _socket = null;
     _status = _Status.listening;
     notifyListeners();
   }
 
   @override
-  void dispose() {
-    _socket?.close();
-    _httpServer?.close();
+  void dispose() async {
+    await _socket?.close();
+    await _httpServer?.close();
     super.dispose();
   }
 }

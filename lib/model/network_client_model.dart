@@ -55,8 +55,8 @@ class NetworkClientModel extends AbstractModel {
   }
 
   @override
-  void dispose() {
-    _socket?.close();
+  void dispose() async {
+    await _socket?.close();
     super.dispose();
   }
 }
