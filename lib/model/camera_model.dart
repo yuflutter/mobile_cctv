@@ -1,25 +1,29 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:camera/camera.dart';
-import 'package:provider/provider.dart';
 
 import '/settings.dart';
 import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/data/image_dto.dart';
-import '/model/network_client_model.dart';
+import '/model/abstract_image_stream_source.dart';
 
-class CameraModel extends AbstractModel {
-  final NetworkClientModel? _networkModel;
+class CameraModel extends AbstractModel implements AbstractImageStreamSource {
+  bool _withoutPreview = false;
   //
   CameraController? cameraController;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
   final _frameDurationMs = (1000 / frameFrequency).round();
   var _lastFrameTime = DateTime.now();
 
-  CameraModel(BuildContext context) : _networkModel = context.read<NetworkClientModel>();
-
+  @override
   Stream<ImageDto> get imageStream => _imageStreamController.stream;
+
+  bool get withoutPreview => _withoutPreview;
+  set withoutPreview(bool v) {
+    _withoutPreview = v;
+    notifyListeners();
+  }
 
   void init() async {
     try {
@@ -28,7 +32,7 @@ class CameraModel extends AbstractModel {
       cameraController = CameraController(
         cams[0],
         ResolutionPreset.low,
-        imageFormatGroup: ImageFormatGroup.yuv420, // Для андроида, не уверен что сработает в IOS
+        imageFormatGroup: ImageFormatGroup.yuv420, // В андроиде это родной формат, не уверен сработает в IOS
       );
       await cameraController!.initialize();
       cameraController!.startImageStream(
@@ -39,7 +43,6 @@ class CameraModel extends AbstractModel {
               _lastFrameTime = now;
               final dto = ImageDto.fromCameraImage(camImg);
               _imageStreamController.sink.add(dto);
-              _networkModel?.send(dto);
             }
           } catch (e, s) {
             _imageStreamController.sink.addError(Log.error(e, s));

@@ -10,16 +10,17 @@ import '/data/image_dto.dart';
 enum _Status { listening, connected }
 
 class NetworkServerModel extends AbstractModel {
-  final bool bothTest;
+  final bool forLocalTest;
   //
   int port;
+  //
   HttpServer? _httpServer;
   HttpRequest? _request;
   WebSocket? _socket;
   var _status = _Status.listening;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
-  NetworkServerModel({this.bothTest = false}) : port = (!bothTest) ? LocalStorage.port : defaultPort;
+  NetworkServerModel({this.forLocalTest = false}) : port = (!forLocalTest) ? LocalStorage.port : defaultPort;
 
   String get statusText => (_status == _Status.listening)
       ? 'Listening $port ...'
@@ -29,7 +30,7 @@ class NetworkServerModel extends AbstractModel {
 
   void init() async {
     try {
-      if (!bothTest) {
+      if (!forLocalTest) {
         LocalStorage.saveConnectionInfo(port: port);
       }
       _httpServer = await HttpServer.bind(InternetAddress.anyIPv4, port);

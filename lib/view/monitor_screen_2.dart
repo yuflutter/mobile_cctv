@@ -7,30 +7,28 @@ import '/model/network_server_model.dart';
 import '/view/image_stream_view.dart';
 
 class MonitorScreen2 extends StatelessWidget {
-  final bool isBothTest;
-
-  const MonitorScreen2({super.key, this.isBothTest = false});
+  const MonitorScreen2({super.key});
 
   @override
   build(context) {
-    final network = context.watch<NetworkServerModel>();
+    final networkModel = context.watch<NetworkServerModel>();
     return Screen(
-      noBackButton: isBothTest,
+      noBackButton: networkModel.forLocalTest,
       body: Center(
         child: Column(
           children: [
             Expanded(
               child: Center(
-                child: ImageStreamView(imageStream: network.imageStream),
+                child: ImageStreamView(imageStream: networkModel.imageStream),
               ),
             ),
             Space1(),
-            (network.error != null)
+            (networkModel.error != null)
                 ? ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height / 5),
-                    child: ErrorView(network.error!),
+                    constraints: BoxConstraints(maxHeight: mediaSize(context).height / 5),
+                    child: ErrorView(networkModel.error!),
                   )
-                : Text(network.statusText, style: TextStyle(color: Colors.red)),
+                : Text(networkModel.statusText, style: TextStyle(color: Colors.red)),
           ],
         ),
       ),

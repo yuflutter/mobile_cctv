@@ -6,8 +6,9 @@ import '/view/image_view.dart';
 
 class ImageStreamView extends StatelessWidget {
   final Stream<ImageDto> imageStream;
+  final Widget placeholder;
 
-  const ImageStreamView({super.key, required this.imageStream});
+  const ImageStreamView({super.key, required this.imageStream, this.placeholder = const Waiting()});
 
   @override
   build(context) {
@@ -17,7 +18,7 @@ class ImageStreamView extends StatelessWidget {
         return (snapshot.hasError)
             ? ErrorView(snapshot.error!)
             : (!snapshot.hasData)
-                ? Waiting()
+                ? placeholder
                 : ImageView(imageDto: snapshot.data!);
       },
     );

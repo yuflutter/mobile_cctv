@@ -30,6 +30,8 @@ class Space4 extends StatelessWidget {
   build(context) => SizedBox(width: 20, height: 20);
 }
 
+Size mediaSize(BuildContext context) => MediaQuery.of(context).size;
+
 class Screen extends StatelessWidget {
   final Widget body;
   final bool noBackButton;

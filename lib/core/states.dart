@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '/core/abstract_model.dart';
 
 class Waiting extends StatelessWidget {
+  const Waiting({super.key});
   @override
   build(context) => Center(child: CircularProgressIndicator());
 }
