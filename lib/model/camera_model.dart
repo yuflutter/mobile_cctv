@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:camera/camera.dart';
 
-import '/settings.dart';
+import '/settings.dart' as settings;
 import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/data/image_dto.dart';
@@ -13,7 +13,7 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
   //
   CameraController? cameraController;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
-  final _frameDurationMs = (1000 / frameFrequency).round();
+  final _frameDurationMs = (1000 / settings.frameFrequency).round();
   var _lastFrameTime = DateTime.now();
 
   @override
@@ -31,7 +31,7 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
       final cams = await availableCameras();
       cameraController = CameraController(
         cams[0],
-        cameraResolution,
+        settings.cameraResolution,
         imageFormatGroup: ImageFormatGroup.yuv420, // В андроиде это родной формат, не уверен сработает в IOS
       );
       await cameraController!.initialize();

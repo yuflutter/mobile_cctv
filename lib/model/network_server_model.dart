@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 
-import '/settings.dart';
+import '/settings.dart' as settings;
 import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/core/local_storage.dart';
@@ -21,7 +21,7 @@ class NetworkServerModel extends AbstractModel {
   StreamSubscription? _streamSubscription;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
-  NetworkServerModel({this.forLocalTest = false}) : port = (!forLocalTest) ? LocalStorage.port : defaultPort;
+  NetworkServerModel({this.forLocalTest = false}) : port = (!forLocalTest) ? LocalStorage.port : settings.defaultPort;
 
   String get statusText => (_status == _Status.listening)
       ? 'Listening $port ...'
@@ -39,7 +39,7 @@ class NetworkServerModel extends AbstractModel {
         (req) async {
           try {
             _request = req;
-            _socket = await WebSocketTransformer.upgrade(req, compression: socketCompressionOption);
+            _socket = await WebSocketTransformer.upgrade(req, compression: settings.socketCompressionOption);
             _status = _Status.connected;
             notifyListeners();
             _streamSubscription = _socket!.listen(

@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '/settings.dart';
+import '/settings.dart' as settings;
 
 class LocalStorage {
   static SharedPreferences? _storage;
@@ -9,8 +9,8 @@ class LocalStorage {
     _storage = await SharedPreferences.getInstance();
   }
 
-  static String get host => _storage?.getString('host') ?? defaultHost;
-  static int get port => _storage?.getInt('port') ?? defaultPort;
+  static String get host => _storage?.getString('host') ?? settings.defaultHost;
+  static int get port => _storage?.getInt('port') ?? settings.defaultPort;
 
   static Future<void> saveConnectionInfo({String? host, required int port}) {
     return Future.wait([

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '/settings.dart';
+import '/settings.dart' as settings;
 import '/core/abstract_model.dart';
 import '/core/local_storage.dart';
 import '/data/image_dto.dart';
@@ -28,8 +28,8 @@ class NetworkClientModel extends AbstractModel {
       host = LocalStorage.host;
       port = LocalStorage.port;
     } else {
-      host = defaultHost;
-      port = defaultPort;
+      host = settings.defaultHost;
+      port = settings.defaultPort;
     }
   }
 
@@ -41,7 +41,7 @@ class NetworkClientModel extends AbstractModel {
       if (!forLocalTest) {
         LocalStorage.saveConnectionInfo(host: host, port: port);
       }
-      _socket = await WebSocket.connect(url, compression: socketCompressionOption);
+      _socket = await WebSocket.connect(url, compression: settings.socketCompressionOption);
       _imageStream.listen(_send);
       _status = _Status.connected;
       setDone();

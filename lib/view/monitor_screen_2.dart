@@ -30,7 +30,6 @@ class MonitorScreen2 extends StatelessWidget {
                     child: ErrorView(networkModel.error!),
                   )
                 : Text(networkModel.statusText, style: TextStyle(color: Colors.red)),
-            Space1(),
           ],
         ),
       ),
