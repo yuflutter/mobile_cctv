@@ -31,7 +31,7 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
       final cams = await availableCameras();
       cameraController = CameraController(
         cams[0],
-        ResolutionPreset.low,
+        cameraResolution,
         imageFormatGroup: ImageFormatGroup.yuv420, // В андроиде это родной формат, не уверен сработает в IOS
       );
       await cameraController!.initialize();

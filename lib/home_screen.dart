@@ -28,7 +28,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   build(context) {
     return Screen(
-      noBackButton: true,
+      withoutBackButton: true,
       body: FutureBuilder(
         future: _initFuture,
         builder: (context, snapshot) {

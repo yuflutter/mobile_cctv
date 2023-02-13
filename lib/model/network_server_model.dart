@@ -18,6 +18,7 @@ class NetworkServerModel extends AbstractModel {
   HttpRequest? _request;
   WebSocket? _socket;
   var _status = _Status.listening;
+  StreamSubscription? _streamSubscription;
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
   NetworkServerModel({this.forLocalTest = false}) : port = (!forLocalTest) ? LocalStorage.port : defaultPort;
@@ -38,10 +39,10 @@ class NetworkServerModel extends AbstractModel {
         (req) async {
           try {
             _request = req;
-            _socket = await WebSocketTransformer.upgrade(req);
+            _socket = await WebSocketTransformer.upgrade(req, compression: socketCompressionOption);
             _status = _Status.connected;
             notifyListeners();
-            _socket!.listen(
+            _streamSubscription = _socket!.listen(
               (bytes) {
                 try {
                   try {
@@ -68,7 +69,14 @@ class NetworkServerModel extends AbstractModel {
     setDone();
   }
 
+  @override
+  setError(Object e, [StackTrace? s]) {
+    _disconnect();
+    super.setError(e, s);
+  }
+
   void _disconnect() async {
+    await _streamSubscription?.cancel();
     await _socket?.close();
     _socket = null;
     _status = _Status.listening;
@@ -76,7 +84,8 @@ class NetworkServerModel extends AbstractModel {
   }
 
   @override
-  void dispose() async {
+  dispose() async {
+    await _streamSubscription?.cancel();
     await _socket?.close();
     await _httpServer?.close();
     super.dispose();

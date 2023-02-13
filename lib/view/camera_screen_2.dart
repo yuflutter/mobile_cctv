@@ -16,7 +16,8 @@ class CameraScreen2 extends StatelessWidget {
     final cameraModel = context.watch<CameraModel>();
     final networkModel = context.watch<NetworkClientModel>();
     return Screen(
-      noBackButton: networkModel.forLocalTest,
+      withoutBackButton: networkModel.forLocalTest,
+      withoutPadding: networkModel.forLocalTest,
       body: Center(
         child: Column(
           children: [

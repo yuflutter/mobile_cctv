@@ -13,7 +13,8 @@ class MonitorScreen2 extends StatelessWidget {
   build(context) {
     final networkModel = context.watch<NetworkServerModel>();
     return Screen(
-      noBackButton: networkModel.forLocalTest,
+      withoutBackButton: networkModel.forLocalTest,
+      withoutPadding: networkModel.forLocalTest,
       body: Center(
         child: Column(
           children: [
@@ -29,6 +30,7 @@ class MonitorScreen2 extends StatelessWidget {
                     child: ErrorView(networkModel.error!),
                   )
                 : Text(networkModel.statusText, style: TextStyle(color: Colors.red)),
+            Space1(),
           ],
         ),
       ),

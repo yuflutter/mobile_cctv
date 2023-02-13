@@ -12,17 +12,18 @@ import '/model/abstract_image_stream_source.dart';
 enum _Status { connecting, connected }
 
 class NetworkClientModel extends AbstractModel {
+  late final Stream<ImageDto> _imageStream;
   final bool forLocalTest;
   //
   late String host;
   late int port;
-  late final StreamSubscription<ImageDto> _imageStreamSubscription;
   //
   var _status = _Status.connecting;
   WebSocket? _socket;
   Future? _secondInitAttempt;
 
   NetworkClientModel(BuildContext context, {this.forLocalTest = false}) {
+    _imageStream = context.read<AbstractImageStreamSource>().imageStream;
     if (!forLocalTest) {
       host = LocalStorage.host;
       port = LocalStorage.port;
@@ -30,7 +31,6 @@ class NetworkClientModel extends AbstractModel {
       host = defaultHost;
       port = defaultPort;
     }
-    _imageStreamSubscription = context.read<AbstractImageStreamSource>().imageStream.listen(_send);
   }
 
   String get url => 'ws://$host:$port';
@@ -41,7 +41,8 @@ class NetworkClientModel extends AbstractModel {
       if (!forLocalTest) {
         LocalStorage.saveConnectionInfo(host: host, port: port);
       }
-      _socket = await WebSocket.connect(url);
+      _socket = await WebSocket.connect(url, compression: socketCompressionOption);
+      _imageStream.listen(_send);
       _status = _Status.connected;
       setDone();
     } catch (e, s) {
@@ -69,7 +70,6 @@ class NetworkClientModel extends AbstractModel {
 
   @override
   void dispose() {
-    _imageStreamSubscription.cancel();
     _socket?.close();
     super.dispose();
   }

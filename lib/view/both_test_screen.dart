@@ -29,6 +29,7 @@ class BothTestScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(child: CameraScreen2()),
+                Space1(),
                 Container(height: 2, color: Colors.white),
                 Expanded(child: MonitorScreen2()),
               ],

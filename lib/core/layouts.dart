@@ -34,20 +34,21 @@ Size mediaSize(BuildContext context) => MediaQuery.of(context).size;
 
 class Screen extends StatelessWidget {
   final Widget body;
-  final bool noBackButton;
+  final bool withoutBackButton;
+  final bool withoutPadding;
 
-  const Screen({super.key, required this.body, this.noBackButton = false});
+  const Screen({super.key, required this.body, this.withoutBackButton = false, this.withoutPadding = false});
 
   @override
   build(context) {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(5),
+          padding: EdgeInsets.all((!withoutPadding) ? 5 : 0),
           child: body,
         ),
       ),
-      floatingActionButton: (!noBackButton)
+      floatingActionButton: (!withoutBackButton)
           ? FloatingActionButton(
               onPressed: () => _back(context),
               mini: true,

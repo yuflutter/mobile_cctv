@@ -7,7 +7,10 @@ import '/core/states.dart';
 import '/home_screen.dart';
 
 void main() {
-  ErrorWidget.builder = (e) => Screen(body: ErrorView(Log.error(e.exception, e.stack)));
+  ErrorWidget.builder = (e) => Screen(
+        withoutBackButton: true,
+        body: ErrorView(Log.error(e.exception, e.stack)),
+      );
   runApp(const MyApp());
 }
 
