@@ -42,9 +42,7 @@ class ImageView extends StatelessWidget {
                 } else if (!snapshot.hasData) {
                   return Void();
                 } else {
-                  return CustomPaint(
-                    painter: _ImagePainter(snapshot.data!),
-                  );
+                  return CustomPaint(painter: _ImagePainter(snapshot.data!));
                 }
               },
             );

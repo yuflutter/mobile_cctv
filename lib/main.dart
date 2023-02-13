@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '/core/log.dart';
 import '/core/layouts.dart';
@@ -7,10 +8,9 @@ import '/core/states.dart';
 import '/home_screen.dart';
 
 void main() {
-  ErrorWidget.builder = (e) => Screen(
-        withoutBackButton: true,
-        body: ErrorView(Log.error(e.exception, e.stack)),
-      );
+  ErrorWidget.builder = (e) => Screen(withoutBackButton: true, body: ErrorView(Log.error(e.exception, e.stack)));
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(const MyApp());
 }
 

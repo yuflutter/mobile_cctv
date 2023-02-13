@@ -32,7 +32,7 @@ class _HomeScreen extends State<HomeScreen> {
       body: FutureBuilder(
         future: _initFuture,
         builder: (context, snapshot) {
-          if (snapshot.error != null) {
+          if (snapshot.hasError) {
             return ErrorView(Log.error(snapshot.error!, snapshot.stackTrace));
           } else if (snapshot.connectionState == ConnectionState.waiting) {
             return Waiting();

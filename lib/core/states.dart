@@ -24,8 +24,9 @@ class ErrorView extends StatelessWidget {
 
 class ModelViewer<T extends AbstractModel> extends StatelessWidget {
   final Widget Function(BuildContext context, T model) builder;
+  final Widget placeholder;
 
-  const ModelViewer({required this.builder});
+  const ModelViewer({required this.builder, this.placeholder = const Waiting()});
 
   @override
   build(context) {
@@ -33,7 +34,7 @@ class ModelViewer<T extends AbstractModel> extends StatelessWidget {
     return (model.error != null)
         ? ErrorView(model.error!)
         : (model.waiting)
-            ? Waiting()
+            ? placeholder
             : builder(context, model);
   }
 }
