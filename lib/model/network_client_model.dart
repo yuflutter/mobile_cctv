@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '/settings.dart' as settings;
 import '/core/abstract_model.dart';
 import '/core/local_storage.dart';
+import '/core/log.dart';
 import '/data/image_dto.dart';
 import '/model/abstract_image_stream_source.dart';
 
@@ -19,8 +20,9 @@ class NetworkClientModel extends AbstractModel {
   late int port;
   //
   var _status = _Status.connecting;
-  WebSocket? _socket;
-  Future? _secondInitAttempt;
+  Socket? _socket;
+  Future? _nextAttemptConnect;
+  StreamSubscription? _socketSubscription;
 
   NetworkClientModel(BuildContext context, {this.forLocalTest = false}) {
     _imageStream = context.read<AbstractImageStreamSource>().imageStream;
@@ -33,25 +35,34 @@ class NetworkClientModel extends AbstractModel {
     }
   }
 
-  String get url => 'ws://$host:$port';
-  String get statusText => (_status == _Status.connecting) ? 'Connecting to $url ...' : 'Connected to $host';
+  String get statusText => '${_status.name} to $host:$port';
 
   void init() async {
     try {
       if (!forLocalTest) {
         LocalStorage.saveConnectionInfo(host: host, port: port);
       }
-      _socket = await WebSocket.connect(url, compression: settings.socketCompressionOption);
-      _imageStream.listen(_send);
+      _connect();
+      Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
+    } catch (e, s) {
+      setError(e, s);
+    }
+  }
+
+  void _connect() async {
+    try {
+      _socket = await Socket.connect(host, port);
+      _socketSubscription = _imageStream.listen(_send);
       _status = _Status.connected;
       setDone();
     } catch (e, s) {
-      if (_secondInitAttempt == null) {
-        _secondInitAttempt = Future.delayed(
+      Log.error(e, s);
+      if (_nextAttemptConnect == null) {
+        _nextAttemptConnect = Future.delayed(
           Duration(seconds: 10),
           () {
             clearError();
-            init();
+            _connect();
           },
         );
       } else {
@@ -60,17 +71,29 @@ class NetworkClientModel extends AbstractModel {
     }
   }
 
+  void _disconnect() async {
+    await _socketSubscription?.cancel();
+    await _socket?.close();
+  }
+
   void _send(ImageDto img) {
     try {
-      _socket?.add(img.dto);
+      // Log.info('SENT ${img.bytes.length}');
+      _socket?.add(img.bytes);
     } catch (e, s) {
       setError(e, s);
     }
   }
 
   @override
-  void dispose() {
-    _socket?.close();
+  setError(Object e, [StackTrace? s]) {
+    _disconnect();
+    super.setError(e, s);
+  }
+
+  @override
+  void dispose() async {
+    _disconnect();
     super.dispose();
   }
 }

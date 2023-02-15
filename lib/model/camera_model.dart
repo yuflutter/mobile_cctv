@@ -12,18 +12,19 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
   bool _withoutPreview = false;
   //
   CameraController? cameraController;
-  final _imageStreamController = StreamController<ImageDto>.broadcast();
   final _frameDurationMs = (1000 / settings.frameFrequency).round();
-  var _lastFrameTime = DateTime.now();
-
-  @override
-  Stream<ImageDto> get imageStream => _imageStreamController.stream;
+  DateTime? _lastFrameTime;
+  //
+  final _imageStreamController = StreamController<ImageDto>.broadcast();
 
   bool get withoutPreview => _withoutPreview;
   set withoutPreview(bool v) {
     _withoutPreview = v;
     notifyListeners();
   }
+
+  @override
+  Stream<ImageDto> get imageStream => _imageStreamController.stream;
 
   void init() async {
     try {
@@ -32,14 +33,15 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
       cameraController = CameraController(
         cams[0],
         settings.cameraResolution,
-        imageFormatGroup: ImageFormatGroup.yuv420, // В андроиде это родной формат, не уверен сработает в IOS
+        imageFormatGroup: ImageFormatGroup.yuv420, // В андроиде это родной формат, не уверен что сработает в IOS
+        enableAudio: false,
       );
       await cameraController!.initialize();
       cameraController!.startImageStream(
         (camImg) {
           try {
             final now = DateTime.now();
-            if (now.difference(_lastFrameTime) > Duration(milliseconds: _frameDurationMs)) {
+            if (_lastFrameTime == null || now.difference(_lastFrameTime!) > Duration(milliseconds: _frameDurationMs)) {
               _lastFrameTime = now;
               final dto = ImageDto.fromCameraImage(camImg);
               _imageStreamController.sink.add(dto);

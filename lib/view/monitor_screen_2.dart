@@ -20,7 +20,9 @@ class MonitorScreen2 extends StatelessWidget {
           children: [
             Expanded(
               child: Center(
-                child: ImageStreamView(imageStream: networkModel.imageStream),
+                child: InteractiveViewer(
+                  child: ImageStreamView(imageStream: networkModel.imageStream),
+                ),
               ),
             ),
             Space1(),

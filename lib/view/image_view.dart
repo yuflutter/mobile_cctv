@@ -38,7 +38,10 @@ class ImageView extends StatelessWidget {
               future: imageDto.toUiImage(targetWidth: targetWidth, targetHeight: targetHeight),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return ErrorView(Log.error(snapshot.error!, snapshot.stackTrace));
+                  return RotatedBox(
+                    quarterTurns: -1,
+                    child: ErrorView(Log.error(snapshot.error!, snapshot.stackTrace)),
+                  );
                 } else if (!snapshot.hasData) {
                   return Void();
                 } else {
