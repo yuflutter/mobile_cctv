@@ -13,7 +13,7 @@ enum _Status { listening, connected }
 class NetworkServerModel extends AbstractModel implements AbstractImageStreamSource {
   final bool forLocalTest;
   //
-  int port;
+  late int port;
   //
   ServerSocket? _server;
   Socket? _socket;
@@ -26,7 +26,9 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
   //
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
-  NetworkServerModel({this.forLocalTest = false}) : port = (!forLocalTest) ? LocalStorage.port : settings.defaultPort;
+  NetworkServerModel({this.forLocalTest = false}) {
+    port = (!forLocalTest) ? LocalStorage.port : settings.defaultPort;
+  }
 
   @override
   Stream<ImageDto> get imageStream => _imageStreamController.stream;

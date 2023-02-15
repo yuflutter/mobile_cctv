@@ -3,25 +3,15 @@ import 'package:flutter/widgets.dart';
 import 'package:camera/camera.dart';
 
 import '/settings.dart' as settings;
-import '/core/log.dart';
 import '/core/abstract_model.dart';
 import '/data/image_dto.dart';
 import '/model/abstract_image_stream_source.dart';
 
 class CameraModel extends AbstractModel implements AbstractImageStreamSource {
-  bool _withoutPreview = false;
-  //
   CameraController? cameraController;
-  final _frameDurationMs = (1000 / settings.frameFrequency).round();
+  final _frameDuration = Duration(milliseconds: (1000 / settings.frameFrequency).round());
   DateTime? _lastFrameTime;
-  //
   final _imageStreamController = StreamController<ImageDto>.broadcast();
-
-  bool get withoutPreview => _withoutPreview;
-  set withoutPreview(bool v) {
-    _withoutPreview = v;
-    notifyListeners();
-  }
 
   @override
   Stream<ImageDto> get imageStream => _imageStreamController.stream;
@@ -37,17 +27,17 @@ class CameraModel extends AbstractModel implements AbstractImageStreamSource {
         enableAudio: false,
       );
       await cameraController!.initialize();
-      cameraController!.startImageStream(
+      await cameraController!.startImageStream(
         (camImg) {
           try {
             final now = DateTime.now();
-            if (_lastFrameTime == null || now.difference(_lastFrameTime!) > Duration(milliseconds: _frameDurationMs)) {
+            if (_lastFrameTime == null || now.difference(_lastFrameTime!) > _frameDuration) {
               _lastFrameTime = now;
               final dto = ImageDto.fromCameraImage(camImg);
               _imageStreamController.sink.add(dto);
             }
           } catch (e, s) {
-            _imageStreamController.sink.addError(Log.error(e, s));
+            setError(e, s);
           }
         },
       );

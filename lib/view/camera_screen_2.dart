@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import '/core/layouts.dart';
 import '/core/states.dart';
 import '/model/camera_model.dart';
+import '/model/camera_screens_model.dart';
 import '/model/network_client_model.dart';
 import '/view/image_stream_view.dart';
 
@@ -14,6 +15,7 @@ class CameraScreen2 extends StatelessWidget {
   @override
   build(context) {
     final cameraModel = context.watch<CameraModel>();
+    final cameraScreensModel = context.watch<CameraScreensModel>();
     final networkModel = context.watch<NetworkClientModel>();
     return Screen(
       withoutBackButton: networkModel.forLocalTest,
@@ -21,7 +23,7 @@ class CameraScreen2 extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            ...(!cameraModel.withoutPreview)
+            ...(!cameraScreensModel.withoutPreview)
                 ? [
                     Expanded(
                       child: ModelViewer<CameraModel>(

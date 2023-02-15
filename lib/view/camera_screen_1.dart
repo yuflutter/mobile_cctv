@@ -5,6 +5,7 @@ import '/core/injections.dart';
 import '/core/layouts.dart';
 import '/model/camera_model.dart';
 import '/model/abstract_image_stream_source.dart';
+import '/model/camera_screens_model.dart';
 import '/model/network_client_model.dart';
 import '/view/camera_screen_2.dart';
 
@@ -17,11 +18,12 @@ class CameraScreen1 extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => CameraModel()),
         ChangeNotifierProvider<AbstractImageStreamSource>(create: (context) => context.read<CameraModel>()),
+        ChangeNotifierProvider(create: (context) => CameraScreensModel()),
         ChangeNotifierProvider(create: (context) => NetworkClientModel(context)),
       ],
       builder: (context) {
+        final cameraScreensModel = context.watch<CameraScreensModel>();
         final networkModel = context.watch<NetworkClientModel>();
-        final cameraModel = context.watch<CameraModel>();
         return Screen(
           body: Center(
             child: FractionallySizedBox(
@@ -45,8 +47,8 @@ class CameraScreen1 extends StatelessWidget {
                   ),
                   Space3(),
                   CheckboxListTile(
-                    value: cameraModel.withoutPreview,
-                    onChanged: (v) => cameraModel.withoutPreview = v!,
+                    value: cameraScreensModel.withoutPreview,
+                    onChanged: (v) => cameraScreensModel.withoutPreview = v!,
                     contentPadding: EdgeInsets.zero,
                     title: Text('Without preview'),
                   ),
