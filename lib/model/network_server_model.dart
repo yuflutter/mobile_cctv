@@ -19,10 +19,9 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
   Socket? _socket;
   StreamSubscription? _serverSubscription;
   StreamSubscription? _socketSubscription;
-  Uint8List? _dtoBytes;
-  int? _dtoLength;
+  var _currentFrame = ImageDto.blank();
   var _status = _Status.listening;
-  var _bytesReceived = 0;
+  var _totslBytesReceived = 0;
   //
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
@@ -35,7 +34,7 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
 
   String get statusText => (_status == _Status.listening)
       ? 'listening $port ...'
-      : 'connected from ${_socket?.remoteAddress.host}, received ${_bytesReceived ~/ 1000000} MB';
+      : 'connected from ${_socket?.remoteAddress.host}, received ${_totslBytesReceived ~/ 1000000} MB';
 
   void init() async {
     try {
@@ -67,43 +66,24 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
     Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
   }
 
-  // Написано криво и наспех. Подумать над минимизацией аллокаций памяти + перенести в ImageDto.
-  void _processBytes(Uint8List bytes) {
+  void _processBytes(Uint8List part) {
     try {
       // Log.info('RECEIVED ${bytes.length}');
-      if (_dtoBytes == null) {
-        _dtoBytes = bytes;
-      } else {
-        final bb = BytesBuilder();
-        bb.add(_dtoBytes!);
-        bb.add(bytes);
-        _dtoBytes = bb.toBytes();
-      }
-      if (_dtoLength == null && _dtoBytes!.length >= 4) {
-        _dtoLength = _dtoBytes!.buffer.asByteData(0, 4).getUint32(0);
-      }
-      if (_dtoLength != null) {
-        if (_dtoBytes!.length > _dtoLength!) {
-          _processDto(_dtoBytes!.sublist(0, _dtoLength!));
-          final newDtoBytes = _dtoBytes!.sublist(_dtoLength!);
-          _dtoBytes = null;
-          _dtoLength = null;
-          _processBytes(newDtoBytes);
-        } else if (_dtoBytes!.length == _dtoLength!) {
-          _processDto(_dtoBytes!);
-          _dtoBytes = null;
-          _dtoLength = null;
-        }
-      }
+      _currentFrame.appendBytes(
+        part,
+        (newFrame) {
+          try {
+            _imageStreamController.sink.add(_currentFrame);
+            _totslBytesReceived += _currentFrame.bytes.length;
+            _currentFrame = newFrame ?? ImageDto.blank();
+          } catch (e, s) {
+            setError(e, s);
+          }
+        },
+      );
     } catch (e, s) {
       setError(e, s);
     }
-  }
-
-  void _processDto(Uint8List bytes) {
-    _bytesReceived += bytes.length;
-    // Log.info('PROCESSED ${bytes.length}');
-    _imageStreamController.sink.add(ImageDto.fromBytes(bytes));
   }
 
   @override

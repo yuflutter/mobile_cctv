@@ -4,10 +4,10 @@ import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 
 class ImageDto {
-  // Транспортный пакет: длина пакета(4) + ширина картинки(2) + высота картинки(2) + черно-белые пиксели
-  final Uint8List bytes;
-  final int width;
-  final int height;
+  Uint8List bytes; // Транспортный пакет: длина пакета(4) + ширина,высота картинки(2,2) + черно-белые пиксели(w*h)
+  int width;
+  int height;
+  int? length; // Ожидаемая длина пакета при получении из сокета по частям
   ui.Image? _uiImage; // Кэширование при выводе на экран
 
   ImageDto._(this.bytes, this.width, this.height);
@@ -45,6 +45,34 @@ class ImageDto {
       return (ImageDto._(bytes, headBuf.getUint16(4), headBuf.getUint16(6)));
     } else {
       return ImageDto.blank();
+    }
+  }
+
+  // Используется при получении объекта из сокета по частям.
+  // Неэкономно с точки зрения аллокаций памяти. Отрефакторить!
+  void appendBytes(Uint8List part, void Function(ImageDto? nextFrame) onComplete) {
+    if (bytes.isEmpty) {
+      bytes = part;
+    } else {
+      final bb = BytesBuilder();
+      bb.add(bytes);
+      bb.add(part);
+      bytes = bb.toBytes();
+    }
+    if (length == null && bytes.length >= 8) {
+      final headBuf = bytes.buffer.asByteData(0, 8);
+      length = headBuf.getUint32(0);
+      width = headBuf.getUint16(4);
+      height = headBuf.getUint16(6);
+    }
+    if (length != null) {
+      if (bytes.length > length!) {
+        final nextFrame = ImageDto._(bytes.sublist(length!), 0, 0);
+        bytes = bytes.sublist(0, length!);
+        onComplete(nextFrame);
+      } else if (bytes.length == length!) {
+        onComplete(null);
+      }
     }
   }
 
