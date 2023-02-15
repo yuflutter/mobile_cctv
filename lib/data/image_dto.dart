@@ -67,7 +67,7 @@ class ImageDto {
     }
     if (length != null) {
       if (bytes.length > length!) {
-        final nextFrame = ImageDto._(bytes.sublist(length!), 0, 0);
+        final nextFrame = ImageDto.blank()..appendBytes(bytes.sublist(length!), (_) {});
         bytes = bytes.sublist(0, length!);
         onComplete(nextFrame);
       } else if (bytes.length == length!) {
