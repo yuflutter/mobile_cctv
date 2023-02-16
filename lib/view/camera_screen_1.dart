@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_cctv/model/video_stabilization_model.dart';
 import 'package:provider/provider.dart';
 
 import '/core/injections.dart';
@@ -19,6 +20,7 @@ class CameraScreen1 extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CameraModel()),
         ChangeNotifierProvider<AbstractImageStreamSource>(create: (context) => context.read<CameraModel>()),
         ChangeNotifierProvider(create: (context) => CameraScreensModel()),
+        ChangeNotifierProvider(create: (context) => VideoStabilizationModel()..init()),
         ChangeNotifierProvider(create: (context) => NetworkClientModel(context)),
       ],
       builder: (context) {

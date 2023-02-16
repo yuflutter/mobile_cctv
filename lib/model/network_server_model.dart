@@ -11,17 +11,18 @@ import '/data/image_dto.dart';
 enum _Status { listening, connected }
 
 class NetworkServerModel extends AbstractModel implements AbstractImageStreamSource {
-  final bool forLocalTest;
-  //
   late int port;
+  final bool forLocalTest;
   //
   ServerSocket? _server;
   Socket? _socket;
+  var _currentFrame = ImageDto.blank();
+  var _totslBytesReceived = 0;
+  var _status = _Status.listening;
+  //
   StreamSubscription? _serverSubscription;
   StreamSubscription? _socketSubscription;
-  var _currentFrame = ImageDto.blank();
-  var _status = _Status.listening;
-  var _totslBytesReceived = 0;
+  Timer? _screenRefresher;
   //
   final _imageStreamController = StreamController<ImageDto>.broadcast();
 
@@ -63,7 +64,7 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
       setError(e, s);
     }
     setDone();
-    Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
+    _screenRefresher = Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
   }
 
   void _processBytes(Uint8List part) {
@@ -102,6 +103,7 @@ class NetworkServerModel extends AbstractModel implements AbstractImageStreamSou
 
   @override
   dispose() async {
+    _screenRefresher?.cancel();
     await _disconnect();
     await _serverSubscription?.cancel();
     await _server?.close();

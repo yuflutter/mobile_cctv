@@ -14,15 +14,16 @@ enum _Status { connecting, connected }
 
 class NetworkClientModel extends AbstractModel {
   late final Stream<ImageDto> _imageStream;
-  final bool forLocalTest;
-  //
   late String host;
   late int port;
+  final bool forLocalTest;
   //
-  var _status = _Status.connecting;
   Socket? _socket;
-  Future? _nextAttemptConnect;
+  var _status = _Status.connecting;
+  //
   StreamSubscription? _socketSubscription;
+  Future? _nextAttemptConnect;
+  Timer? _screenRefresher;
 
   NetworkClientModel(BuildContext context, {this.forLocalTest = false}) {
     _imageStream = context.read<AbstractImageStreamSource>().imageStream;
@@ -43,7 +44,7 @@ class NetworkClientModel extends AbstractModel {
         LocalStorage.saveConnectionInfo(host: host, port: port);
       }
       _connect();
-      Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
+      _screenRefresher = Timer.periodic(Duration(seconds: 3), (_) => notifyListeners());
     } catch (e, s) {
       setError(e, s);
     }
@@ -93,6 +94,7 @@ class NetworkClientModel extends AbstractModel {
 
   @override
   void dispose() async {
+    _screenRefresher?.cancel();
     _disconnect();
     super.dispose();
   }
